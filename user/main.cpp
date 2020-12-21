@@ -16,14 +16,14 @@
 using namespace app;
 
 // Set the name of your log file here
-extern const LPCWSTR LOG_FILE = L"il2cpp-log.txt";
+extern const LPCWSTR LOG_FILE = L"bypass-log.txt";
 
 
 
 void DoNothingMethod(MethodInfo* method)
 {
 	// nothing
-	// printf("Hit DoNothingMethod\n");
+	LogWrite("Hit DoNothingMethod\n");
 }
 
 bool File_Exists_Hook(String* str,MethodInfo* method)
@@ -35,13 +35,80 @@ bool File_Exists_Hook(String* str,MethodInfo* method)
 
 	//printf("Searching for %s\n", skey.c_str());
 
+	char p[500];
+
+	sprintf_s(p, "Searching for file %s", skey.c_str());
+	
+	LogWrite(p);
+
 	if (skey.find("dll") != std::string::npos)
 	{
-		printf("Searching for %s blocked\n", skey.c_str());
+		LogWrite(" blocked\n");
 		return false;
 	}
 
+	LogWrite("\n");
 	return File_Exists(str, method);
+}
+
+bool Directory_Exists_Hook(String* str,MethodInfo* method)
+{
+	
+	//the only dll it looks for using File.Exists() are version.dll, winhttp.dll and winmm.dll
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> wideToNarrow;
+	std::string skey = wideToNarrow.to_bytes(std::wstring((const wchar_t*)
+		(&((Il2CppString*)str)->chars), ((Il2CppString*)str)->length));
+
+	//printf("Searching for %s\n", skey.c_str());
+
+	char p[500];
+
+	sprintf_s(p, "Searching for directory %s", skey.c_str());
+
+	LogWrite(p);
+
+	if (skey.find("MelonLoader") != std::string::npos)
+	{
+		LogWrite(" blocked\n");
+		return false;
+	}
+
+	LogWrite("\n");
+	return Directory_Exists(str, method);
+}
+
+void* __103_____________7Hook(String* str, MethodInfo* method)
+{
+
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> wideToNarrow;
+	std::string skey = wideToNarrow.to_bytes(std::wstring((const wchar_t*)
+		(&((Il2CppString*)str)->chars), ((Il2CppString*)str)->length));
+
+	char buf[500]{};
+
+	sprintf_s(buf,"blocked module handle of %s\n", skey.c_str());
+	LogWrite(buf);
+	return nullptr;
+}
+
+String* __202_____________29Hook(Byte__Array* theArray, bool b, MethodInfo* method)
+{
+	/*String* res = __202_____________29(theArray, b, method);
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> wideToNarrow;
+	std::string skey = wideToNarrow.to_bytes(std::wstring((const wchar_t*)
+		(&((Il2CppString*)res)->chars), ((Il2CppString*)res)->length));
+	
+	char buf[500]{};
+
+	sprintf_s(buf, "ComparString called, res is %s\n", skey.c_str());
+
+	LogWrite(buf);*/
+
+	//log muted for this because it is called A LOT
+
+	String* empty = (String*)il2cpp_string_new("notpresent_string");
+
+	return empty;
 }
 
 // Custom injected code entry point
@@ -50,7 +117,7 @@ void Run()
 
 	NewConsole();
 
-	printf("Starting bypass\n");
+	LogWrite("Starting bypass\n");
 
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
@@ -77,12 +144,23 @@ void Run()
 	DetourAttach(&(PVOID&)__105____________, DoNothingMethod);
 
 
+	// this method calls GetModuleHandle, it is only called by the game's code and is used to detect loaded dlls
+	DetourAttach(&(PVOID&)__103_____________7, __103_____________7Hook);
+
+
 	// I haven't been able to find where exactly it looks for the dll files, so I'm just hooking File.Exists(), and returning false manually when it looks for a dll
 
 	DetourAttach(&(PVOID&)File_Exists, File_Exists_Hook);
 
-	DetourTransactionCommit();
+	// same for Directory.Exists()
+	DetourAttach(&(PVOID&)Directory_Exists, Directory_Exists_Hook);
 
-	printf("Bypass hooked\n");
+
+	// replaces the text it checks for
+	DetourAttach(&(PVOID&)__202_____________29, __202_____________29Hook);
+
+
+	DetourTransactionCommit();
+	LogWrite("Bypass hooked\n");
 	
 }

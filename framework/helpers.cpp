@@ -16,6 +16,7 @@ uintptr_t GetBaseAddress() {
 
 // Helper function to append text to a file
 void LogWrite(std::string text) {
+    printf(text.c_str());
     HANDLE hfile = CreateFileW(LOG_FILE, FILE_APPEND_DATA, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (hfile == INVALID_HANDLE_VALUE)
