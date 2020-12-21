@@ -4,4 +4,4 @@ This is just a small dll that disables the checks Phasmophobia uses to detect mo
 
 as an added bonus it disables the $250000 money limit ;)
 
-
+Tried with BepInEx/Doorstop, only supporting this for now.
