@@ -21,21 +21,6 @@
     <ClInclude Include="user\main.h">
       <Filter>user</Filter>
     </ClInclude>
-    <ClInclude Include="appdata\il2cpp-api-functions.h">
-      <Filter>appdata</Filter>
-    </ClInclude>
-    <ClInclude Include="appdata\il2cpp-api-functions-ptr.h">
-      <Filter>appdata</Filter>
-    </ClInclude>
-    <ClInclude Include="appdata\il2cpp-functions.h">
-      <Filter>appdata</Filter>
-    </ClInclude>
-    <ClInclude Include="appdata\il2cpp-types.h">
-      <Filter>appdata</Filter>
-    </ClInclude>
-    <ClInclude Include="appdata\il2cpp-types-ptr.h">
-      <Filter>appdata</Filter>
-    </ClInclude>
     <ClInclude Include="framework\helpers.h">
       <Filter>framework</Filter>
     </ClInclude>
@@ -47,6 +32,21 @@
     </ClInclude>
     <ClInclude Include="framework\pch-il2cpp.h">
       <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="appdata\il2cpp-functions.h">
+      <Filter>appdata</Filter>
+    </ClInclude>
+    <ClInclude Include="appdata\il2cpp-types.h">
+      <Filter>appdata</Filter>
+    </ClInclude>
+    <ClInclude Include="appdata\il2cpp-types-ptr.h">
+      <Filter>appdata</Filter>
+    </ClInclude>
+    <ClInclude Include="appdata\il2cpp-api-functions.h">
+      <Filter>appdata</Filter>
+    </ClInclude>
+    <ClInclude Include="appdata\il2cpp-api-functions-ptr.h">
+      <Filter>appdata</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

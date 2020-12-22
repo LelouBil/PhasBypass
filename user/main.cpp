@@ -18,7 +18,9 @@ using namespace app;
 // Set the name of your log file here
 extern const LPCWSTR LOG_FILE = L"bypass-log.txt";
 
+const std::string NotMelonLoader = "totally_not_melon_loader";
 
+String* not_melon_loader;
 
 void DoNothingMethod(MethodInfo* method)
 {
@@ -41,7 +43,7 @@ bool File_Exists_Hook(String* str,MethodInfo* method)
 	
 	LogWrite(p);
 
-	if (skey.find("dll") != std::string::npos)
+	if (skey.find("dll") != std::string::npos || skey.find(NotMelonLoader) != std::string::npos)
 	{
 		LogWrite(" blocked\n");
 		return false;
@@ -67,7 +69,7 @@ bool Directory_Exists_Hook(String* str,MethodInfo* method)
 
 	LogWrite(p);
 
-	if (skey.find("MelonLoader") != std::string::npos)
+	if (skey.find("MelonLoader") != std::string::npos || skey.find(NotMelonLoader) != std::string::npos)
 	{
 		LogWrite(" blocked\n");
 		return false;
@@ -77,7 +79,10 @@ bool Directory_Exists_Hook(String* str,MethodInfo* method)
 	return Directory_Exists(str, method);
 }
 
-void* __103_____________7Hook(String* str, MethodInfo* method)
+
+// IntPtr \u0924\u0929\u091F\u091B\u091A\u091C\u0927\u091E\u0928\u0927\u0926(String)
+// 1818b0190
+void* TryGetModuleHandleHook(String* str, MethodInfo* method)
 {
 
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> wideToNarrow;
@@ -91,7 +96,11 @@ void* __103_____________7Hook(String* str, MethodInfo* method)
 	return nullptr;
 }
 
-String* __202_____________29Hook(Byte__Array* theArray, bool b, MethodInfo* method)
+
+// String \u0926\u0926\u0920\u0923\u091A\u0921\u0923\u0927\u091D\u091E\u091C(Byte[], Boolean)
+// in __202 class
+// 1814491c0
+String* GetMelonLoaderSearchStrings(Byte__Array* theArray, bool b, MethodInfo* method)
 {
 	/*String* res = __202_____________29(theArray, b, method);
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> wideToNarrow;
@@ -106,9 +115,7 @@ String* __202_____________29Hook(Byte__Array* theArray, bool b, MethodInfo* meth
 
 	//log muted for this because it is called A LOT
 
-	String* empty = (String*)il2cpp_string_new("notpresent_string");
-
-	return empty;
+	return not_melon_loader;
 }
 
 // Custom injected code entry point
@@ -118,6 +125,8 @@ void Run()
 	NewConsole();
 
 	LogWrite("Starting bypass\n");
+
+	not_melon_loader = (String*)il2cpp_string_new(NotMelonLoader.c_str());
 
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
@@ -145,7 +154,7 @@ void Run()
 
 
 	// this method calls GetModuleHandle, it is only called by the game's code and is used to detect loaded dlls
-	DetourAttach(&(PVOID&)__103_____________7, __103_____________7Hook);
+	DetourAttach(&(PVOID&)__103_____________7, TryGetModuleHandleHook);
 
 
 	// I haven't been able to find where exactly it looks for the dll files, so I'm just hooking File.Exists(), and returning false manually when it looks for a dll
@@ -157,7 +166,14 @@ void Run()
 
 
 	// replaces the text it checks for
-	DetourAttach(&(PVOID&)__202_____________29, __202_____________29Hook);
+
+	
+	DetourAttach(&(PVOID&)__202_____________13, GetMelonLoaderSearchStrings);
+
+	// hooks quit for debugging
+	/*DetourAttach(&(PVOID&) Application_Quit_1, DoNothingMethod);
+	DetourAttach(&(PVOID&) Application_Quit, DoNothingMethod);
+	DetourAttach(&(PVOID&)Utils_1_ForceCrash, DoNothingMethod);*/
 
 
 	DetourTransactionCommit();

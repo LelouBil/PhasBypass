@@ -41,8 +41,8 @@
     <ClCompile Include="user\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="appdata\il2cpp-api-functions.h" />
     <ClInclude Include="appdata\il2cpp-api-functions-ptr.h" />
+    <ClInclude Include="appdata\il2cpp-api-functions.h" />
     <ClInclude Include="appdata\il2cpp-functions.h" />
     <ClInclude Include="appdata\il2cpp-types-ptr.h" />
     <ClInclude Include="appdata\il2cpp-types.h" />
