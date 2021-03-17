@@ -28,7 +28,7 @@ void DoNothingMethod(MethodInfo* method)
 	LogWrite("Hit DoNothingMethod\n");
 }
 
-bool File_Exists_Hook(String* str,MethodInfo* method)
+bool File_Exists_Hook(String* str, MethodInfo* method)
 {
 	//the only dll it looks for using File.Exists() are version.dll, winhttp.dll and winmm.dll
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> wideToNarrow;
@@ -40,7 +40,7 @@ bool File_Exists_Hook(String* str,MethodInfo* method)
 	char p[500];
 
 	sprintf_s(p, "Searching for file %s", skey.c_str());
-	
+
 	LogWrite(p);
 
 	if (skey.find("dll") != std::string::npos || skey.find(NotMelonLoader) != std::string::npos)
@@ -53,9 +53,9 @@ bool File_Exists_Hook(String* str,MethodInfo* method)
 	return File_Exists(str, method);
 }
 
-bool Directory_Exists_Hook(String* str,MethodInfo* method)
+bool Directory_Exists_Hook(String* str, MethodInfo* method)
 {
-	
+
 	//the only dll it looks for using File.Exists() are version.dll, winhttp.dll and winmm.dll
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> wideToNarrow;
 	std::string skey = wideToNarrow.to_bytes(std::wstring((const wchar_t*)
@@ -80,8 +80,8 @@ bool Directory_Exists_Hook(String* str,MethodInfo* method)
 }
 
 
-// IntPtr \u0924\u0929\u091F\u091B\u091A\u091C\u0927\u091E\u0928\u0927\u0926(String)
-// 1818b0190
+//    IntPtr \u0923\u0926\u0922\u0920\u0922\u091B\u0922\u091F\u0927\u0929\u0922(String)
+// 18123e620
 void* TryGetModuleHandleHook(String* str, MethodInfo* method)
 {
 
@@ -91,22 +91,22 @@ void* TryGetModuleHandleHook(String* str, MethodInfo* method)
 
 	char buf[500]{};
 
-	sprintf_s(buf,"blocked module handle of %s\n", skey.c_str());
+	sprintf_s(buf, "blocked module handle of %s\n", skey.c_str());
 	LogWrite(buf);
 	return nullptr;
 }
 
 
-// String \u0926\u0926\u0920\u0923\u091A\u0921\u0923\u0927\u091D\u091E\u091C(Byte[], Boolean)
-// in __202 class
-// 1814491c0
+// String \u091C\u0925\u0926\u0920\u0923\u091C\u0920\u091B\u091D\u091B\u091B(Byte[], Boolean)
+// in __199 class
+// 1816b48c0
 String* GetMelonLoaderSearchStrings(Byte__Array* theArray, bool b, MethodInfo* method)
 {
 	/*String* res = __202_____________29(theArray, b, method);
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> wideToNarrow;
 	std::string skey = wideToNarrow.to_bytes(std::wstring((const wchar_t*)
 		(&((Il2CppString*)res)->chars), ((Il2CppString*)res)->length));
-	
+
 	char buf[500]{};
 
 	sprintf_s(buf, "ComparString called, res is %s\n", skey.c_str());
@@ -138,7 +138,7 @@ void Run()
 	// - dnspy
 	// - ollydbd
 	// NOTE: this seems to be buggy because before finding this I got Phasmophobia running with Cheat Engine in the background.
-	DetourAttach(&(PVOID&)__105_____________1, DoNothingMethod);
+	DetourAttach(&(PVOID&)__102____________, DoNothingMethod);
 
 	// This method checks for the following files in the games data directory, on the first one found, it deletes it and calls Application.Quit()
 	// - modconfig.cfg
@@ -146,15 +146,16 @@ void Run()
 	// - coolphobialauncher.exe
 	// - loader.exe
 	// - launcher.exe
-	DetourAttach(&(PVOID&)__105_____________2, DoNothingMethod);
+	DetourAttach(&(PVOID&)__102_____________1, DoNothingMethod);
 
 
 	// This method just checks your money and clamps it to 250000 if it's above it
-	DetourAttach(&(PVOID&)__105____________, DoNothingMethod);
+	// The Phasmophobia developer removed this check!
+	//DetourAttach(&(PVOID&)__105____________, DoNothingMethod);
 
 
 	// this method calls GetModuleHandle, it is only called by the game's code and is used to detect loaded dlls
-	DetourAttach(&(PVOID&)__103_____________7, TryGetModuleHandleHook);
+	DetourAttach(&(PVOID&)__101_____________7, TryGetModuleHandleHook);
 
 
 	// I haven't been able to find where exactly it looks for the dll files, so I'm just hooking File.Exists(), and returning false manually when it looks for a dll
@@ -167,16 +168,16 @@ void Run()
 
 	// replaces the text it checks for
 
-	
-	DetourAttach(&(PVOID&)__202_____________13, GetMelonLoaderSearchStrings);
+
+	DetourAttach(&(PVOID&)__199_____________15, GetMelonLoaderSearchStrings);
 
 	// hooks quit for debugging
-	/*DetourAttach(&(PVOID&) Application_Quit_1, DoNothingMethod);
-	DetourAttach(&(PVOID&) Application_Quit, DoNothingMethod);
+	/*DetourAttach(&(PVOID&)Application_Quit_1, DoNothingMethod);
+	DetourAttach(&(PVOID&)Application_Quit, DoNothingMethod);
 	DetourAttach(&(PVOID&)Utils_1_ForceCrash, DoNothingMethod);*/
 
 
 	DetourTransactionCommit();
 	LogWrite("Bypass hooked\n");
-	
+
 }
