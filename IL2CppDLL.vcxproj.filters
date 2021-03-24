@@ -48,6 +48,9 @@
     <ClInclude Include="appdata\il2cpp-api-functions-ptr.h">
       <Filter>appdata</Filter>
     </ClInclude>
+    <ClInclude Include="packages\Detours.4.0.1\lib\native\include\detours.h">
+      <Filter>user</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="appdata">
