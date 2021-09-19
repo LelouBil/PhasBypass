@@ -30,6 +30,7 @@ void il2cppi_log_write(std::string text) {
     WriteFile(hfile, "\r\n", 2, &written, NULL);
     CloseHandle(hfile);
     std::cout << text << std::endl;
+
 }
 
 // Helper function to open a new console window and redirect stdout there

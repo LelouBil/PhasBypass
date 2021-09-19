@@ -16,9 +16,11 @@
 
 using namespace app;
 
+// Set the name of your log file here
 extern const LPCWSTR LOG_FILE = L"bypass-log.txt";
 
 const std::string NotMelonLoader = "totally_not_melon_loader";
+
 String* not_melon_loader;
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -33,6 +35,7 @@ void DoNothingMethod(MethodInfo* method)
 
 bool File_Exists_Hook(String* str, MethodInfo* method)
 {
+	//the only dll it looks for using File.Exists() are version.dll, winhttp.dll and winmm.dll
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> wideToNarrow;
 	std::string skey = wideToNarrow.to_bytes(std::wstring((const wchar_t*)
 		(&((Il2CppString*)str)->chars), ((Il2CppString*)str)->length));
@@ -52,6 +55,8 @@ bool File_Exists_Hook(String* str, MethodInfo* method)
 
 bool Directory_Exists_Hook(String* str, MethodInfo* method)
 {
+
+	//the only dll it looks for using File.Exists() are version.dll, winhttp.dll and winmm.dll
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> wideToNarrow;
 	std::string skey = wideToNarrow.to_bytes(std::wstring((const wchar_t*)
 		(&((Il2CppString*)str)->chars), ((Il2CppString*)str)->length));
@@ -106,8 +111,13 @@ void* TryGetModuleHandleHook(String* str, MethodInfo* method)
 	SetConsoleTextAttribute(hConsole, 15);
 	#endif
 
+	char buf[500]{};
+
+	sprintf_s(buf, "blocked module handle of %s\n", skey.c_str());
+	LogWrite(buf);
 	return nullptr;
 }
+
 
 String* GetMelonLoaderSearchStrings(Byte__Array* theArray, bool b, MethodInfo* method)
 {
@@ -129,6 +139,7 @@ void Run()
 	SetConsoleTextAttribute(hConsole, 14);
 	il2cppi_log_write("[PhasBypass] Creating Hooks!");
 	not_melon_loader = (String*)il2cpp_string_new(NotMelonLoader.c_str());
+
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
 	DetourAttach(&(PVOID&)__269____________, DoNothingMethod);
@@ -146,6 +157,8 @@ void Run()
 	DetourAttach(&(PVOID&)__274_____________9, DoNothingMethod);
 	DetourAttach(&(PVOID&)__274_____________10, TryGetModuleHandleHook);
 	DetourAttach(&(PVOID&)File_Exists, File_Exists_Hook);
+
+	// same for Directory.Exists()
 	DetourAttach(&(PVOID&)Directory_Exists, Directory_Exists_Hook);
 	DetourAttach(&(PVOID&)String_Contains, String_Contains_Hook);
 
